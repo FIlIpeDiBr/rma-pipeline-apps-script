@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>RMA Pipeline – Portal</title>
+  <style>
+    /* Estilos básicos para o portal do RMA Pipeline */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background-color: #0d47a1;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+    nav {
+      background-color: #eeeeee;
+      border-bottom: 1px solid #dcdcdc;
+    }
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    nav li {
+      margin: 0;
+    }
+    nav a {
+      display: block;
+      padding: 1rem 1.5rem;
+      color: #0d47a1;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      background-color: #d5e3f3;
+    }
+    main {
+      padding: 1.5rem 2rem;
+    }
+    .hidden {
+      display: none;
+    }
+    .actions button {
+      margin: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #graficos .charts-panel {
+      border: 1px solid #dcdcdc;
+      background-color: #ffffff;
+      border-radius: 4px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 70vh;
+    }
+    #graficos .charts-controls {
+      flex: 0 0 auto;
+      max-height: 45vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    #graficos .charts-chart {
+      flex: 1;
+      min-height: 320px;
+      border: 1px dashed #ccc;
+      background-color: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+    #graficos .charts-section {
+      border-bottom: 1px solid #dddddd;
+      padding-bottom: 0.5rem;
+    }
+    #graficos .charts-section:last-child {
+      border-bottom: none;
+    }
+    #graficos .charts-section h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #0d47a1;
+    }
+    #graficos .charts-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    #graficos label {
+      font-size: 0.9rem;
+    }
+    #graficos input[type="text"],
+    #graficos input[type="number"],
+    #graficos input[type="color"] {
+      margin-left: 0.25rem;
+    }
+    #graficos .charts-indicator-row,
+    #graficos .charts-row-entry {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    #graficos .charts-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    #grupos .cadastro-panel {
+      border: 1px solid #dcdcdc;
+      border-radius: 4px;
+      background-color: #ffffff;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    #grupos .cadastro-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #grupos .cadastro-actions button {
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #grupos .cadastro-actions button.danger {
+      background-color: #d32f2f;
+    }
+    #grupos .cadastro-actions button.danger:hover {
+      background-color: #b71c1c;
+    }
+    #grupos .cadastro-actions button:hover {
+      background-color: #1565c0;
+    }
+    #grupos .cadastro-actions .cadastro-order {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+    }
+    #grupos .cadastro-table {
+      border: 1px solid #dcdcdc;
+      border-radius: 4px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    #grupos .cadastro-table-scroll {
+      max-height: none;
+      overflow-y: visible;
+    }
+    #grupos table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #grupos th,
+    #grupos td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+    #grupos th {
+      position: sticky;
+      top: 0;
+      background-color: #f0f0f0;
+      z-index: 1;
+      text-align: left;
+    }
+    #grupos .cadastro-group-cell,
+    #grupos .cadastro-empresa-cell {
+      font-weight: 600;
+    }
+    #grupos .cadastro-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px 6px;
+      font-size: 0.9rem;
+    }
+    #grupos .cadastros-confirm-delete .cadastro-status-cell,
+    #grupos .cadastros-confirm-delete .cadastro-indicadores-cell,
+    #grupos .cadastros-confirm-delete th.cadastro-status-header,
+    #grupos .cadastros-confirm-delete th.cadastro-indicadores-header {
+      display: none;
+    }
+    #grupos .cadastro-arquivo-cell,
+    #grupos th.cadastro-arquivo-header {
+      display: none;
+    }
+    #grupos .cadastros-confirm-delete .cadastro-arquivo-cell,
+    #grupos .cadastros-confirm-delete th.cadastro-arquivo-header {
+      display: table-cell;
+    }
+    .actions button:hover {
+      background-color: #1565c0;
+    }
+    footer {
+      background-color: #eeeeee;
+      border-top: 1px solid #dcdcdc;
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+    /* Layout da seção de relatórios */
+    .report-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .report-container .column {
+      flex: 1 1 300px;
+      border: 1px solid #dcdcdc;
+      padding: 1rem;
+      border-radius: 4px;
+      background-color: #ffffff;
+    }
+    .report-container h3 {
+      margin-top: 0;
+    }
+    .queue-panel {
+      margin-top: 1.5rem;
+      border: 1px solid #dcdcdc;
+      border-radius: 4px;
+      background-color: #ffffff;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .queue-header h3 {
+      margin: 0;
+    }
+    .queue-table {
+      overflow-x: auto;
+    }
+    .queue-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .queue-table th,
+    .queue-table td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      font-size: 0.9rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .queue-progress {
+      background: #f0f0f0;
+      border-radius: 8px;
+      height: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .queue-progress-bar {
+      height: 100%;
+      background: #0d47a1;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .queue-progress-label {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      color: #555;
+    }
+
+    .form-group {
+      margin: 0.5rem 0;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RMA Pipeline</h1>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="#" onclick="showSection('entrada'); return false;">Entrada</a></li>
+      <li><a href="#" onclick="showSection('relatorios'); return false;">Relatórios</a></li>
+      <li><a href="#" onclick="showSection('indicadores'); return false;">Indicadores</a></li>
+      <li><a href="#" onclick="showSection('grupos'); return false;">Cadastros</a></li>
+      <li><a href="#" onclick="showSection('graficos'); return false;">Gráficos</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section id="entrada" class="hidden">
+      <h2>Processamento de Entrada</h2>
+      <p>Utilize as opções abaixo para processar arquivos na pasta de entrada e estruturar os dados.</p>
+      <div class="actions">
+        <button onclick="processarEntrada()">Processar arquivos de entrada</button>
+        <button onclick="sincronizarCadastros()">Sincronizar cadastros e arquivos</button>
+        <button onclick="extrairPendentes()">Extrair e estruturar pendentes</button>
+        <button onclick="extrairTodos()">Corrigir Erros de Extração</button>
+      </div>
+    </section>
+    <section id="relatorios" class="hidden">
+      <h2>Relatórios</h2>
+      <p>Use os formulários abaixo para gerar relatórios individuais ou de grupo. Primeiro selecione o modelo desejado e depois a empresa/grupo e período.</p>
+      <div class="report-container">
+        <div class="column">
+          <h3>Relatório Individual</h3>
+          <div class="form-group">
+            <label for="templateIndSelect">Template:</label>
+            <select id="templateIndSelect"></select>
+          </div>
+          <div class="form-group">
+            <label for="empresaIndSelect">Empresa:</label>
+            <select id="empresaIndSelect" onchange="empresaChanged()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="periodoIndSelect">Período:</label>
+            <select id="periodoIndSelect">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button onclick="gerarRelatorioIndividualPortal()">Gerar</button>
+          </div>
+        </div>
+        <div class="column">
+          <h3>Relatório de Grupo</h3>
+          <div class="form-group">
+            <label for="templateGrpSelect">Template:</label>
+            <select id="templateGrpSelect"></select>
+          </div>
+          <div class="form-group">
+            <label for="grupoGrpSelect">Grupo:</label>
+            <select id="grupoGrpSelect" onchange="grupoChanged()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="periodoGrpSelect">Período:</label>
+            <select id="periodoGrpSelect">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button onclick="gerarRelatorioGrupoPortal()">Gerar</button>
+          </div>
+        </div>
+      </div>
+      <div class="queue-panel" id="relatorios-queue-panel">
+        <div class="queue-header">
+          <h3>Fila de execução</h3>
+          <button type="button" onclick="atualizarFilaRelatorios()">Atualizar fila</button>
+        </div>
+        <div class="queue-table">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 12%;">Tipo</th>
+                <th style="width: 20%;">Entidade</th>
+                <th style="width: 10%;">Período</th>
+                <th style="width: 28%;">Status</th>
+                <th style="width: 20%;">Progresso</th>
+                <th style="width: 10%;">Arquivo</th>
+              </tr>
+            </thead>
+            <tbody id="relatorios-queue-body">
+              <tr>
+                <td colspan="6">Carregando fila...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section id="indicadores" class="hidden">
+      <h2>Indicadores</h2>
+      <p>Calcule percentuais da DRE e do Balanço, gere indicadores por período e acompanhe resultados consolidados.</p>
+      <div class="actions">
+        <button onclick="calcularPercentuais()">Calcular percentuais DRE/Balanço</button>
+        <button onclick="gerarIndicadoresPendentes()">Gerar indicadores pendentes</button>
+        <button onclick="gerarIndicadoresGruposPendentes()">Gerar indicadores de grupos pendentes</button>
+      </div>
+      <div class="report-container">
+        <div class="column">
+          <h3>Indicadores por Empresa</h3>
+          <p>Selecione a empresa e o período desejado para gerar/atualizar os indicadores.</p>
+          <div class="form-group">
+            <label for="indicEmpresaSelect">Empresa:</label>
+            <select id="indicEmpresaSelect" onchange="indicEmpresaChanged()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="indicPeriodoSelect">Período:</label>
+            <select id="indicPeriodoSelect">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button onclick="gerarIndicadoresEmpresaPortal()">Gerar indicadores</button>
+          </div>
+        </div>
+        <div class="column">
+          <h3>Indicadores por Grupo</h3>
+          <p>Escolha um grupo e período para consolidar e gravar os indicadores.</p>
+          <div class="form-group">
+            <label for="indicGrupoSelect">Grupo:</label>
+            <select id="indicGrupoSelect" onchange="indicGrupoChanged()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="indicGrupoPeriodoSelect">Período:</label>
+            <select id="indicGrupoPeriodoSelect">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button onclick="gerarIndicadoresGrupoPortal()">Gerar indicadores</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="grupos" class="hidden">
+      <h2>Cadastros</h2>
+      <p>Consulte grupos, empresas e períodos com seus documentos, status e indicadores. Use "Editar cadastros" para ajustar grupo ou empresa.</p>
+      <div class="cadastro-panel">
+        <div class="cadastro-actions">
+          <div>
+            <button id="cadastros-edit-btn" type="button" onclick="entrarEdicaoCadastros()">Editar cadastros</button>
+            <button id="cadastros-delete-btn" type="button" class="danger" onclick="entrarExclusaoCadastros()">Excluir cadastros</button>
+            <button id="cadastros-cancel-btn" type="button" class="hidden" onclick="cancelarEdicaoCadastros()">Cancelar edição</button>
+            <button id="cadastros-save-btn" type="button" class="hidden" onclick="salvarCadastrosPortal()">Salvar alterações</button>
+            <button id="cadastros-cancel-delete-btn" type="button" class="hidden" onclick="cancelarExclusaoCadastros()">Cancelar exclusão</button>
+            <button id="cadastros-confirm-delete-btn" type="button" class="hidden danger" onclick="confirmarExclusaoCadastros()">Confirmar exclusão</button>
+          </div>
+          <div class="cadastro-order">
+            <span>Ordem:</span>
+            <button id="cadastros-sort-toggle" type="button" onclick="toggleOrdenacaoCadastros()">A-Z</button>
+          </div>
+        </div>
+        <div class="cadastro-table">
+          <div class="cadastro-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 16%;">Grupo</th>
+                  <th style="width: 20%;">Empresa</th>
+                  <th style="width: 12%;">Período</th>
+                  <th style="width: 16%;">Documentos</th>
+                  <th class="cadastro-arquivo-header" style="width: 20%;">Arquivo</th>
+                  <th class="cadastro-status-header" style="width: 16%;">Status</th>
+                  <th class="cadastro-indicadores-header" style="width: 20%;">Indicadores</th>
+                </tr>
+              </thead>
+              <tbody id="cadastros-table-body">
+                <tr>
+                  <td colspan="7">Carregando cadastros...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="cadastros-delete-actions" class="hidden" style="margin-top:0.75rem; text-align:right;">
+          <button type="button" class="danger" onclick="executarExclusaoCadastros()">Excluir esses cadastros</button>
+        </div>
+      </div>
+    </section>
+    <section id="graficos" class="hidden">
+      <h2>Painel de Gráficos</h2>
+      <p>Selecione indicadores e períodos para montar gráficos comparativos diretamente no portal.</p>
+      <div class="charts-panel">
+        <div class="charts-controls">
+          <div class="charts-section">
+            <h3>Título e fonte</h3>
+            <div class="charts-inline">
+              <label>Título:
+                <input id="charts-title-input" type="text" value="Indicadores">
+              </label>
+              <label>Tamanho do título:
+                <input id="charts-title-font" type="number" min="8" max="40" value="18">
+              </label>
+              <label>Tamanho dos eixos:
+                <input id="charts-axis-font" type="number" min="6" max="24" value="10">
+              </label>
+            </div>
+          </div>
+
+          <div class="charts-section" id="charts-indicators-section">
+            <div class="charts-inline" style="justify-content: space-between;">
+              <h3>Indicadores (séries)</h3>
+              <div>
+                <button type="button" onclick="chartsToggleAllSeries(true)">Marcar todos</button>
+                <button type="button" onclick="chartsToggleAllSeries(false)">Desmarcar</button>
+              </div>
+            </div>
+            <!-- linhas de indicadores preenchidas via JS -->
+          </div>
+
+          <div class="charts-section" id="charts-rows-section">
+            <div class="charts-inline" style="justify-content: space-between;">
+              <h3>Linhas (empresa/período)</h3>
+              <div>
+                <button type="button" onclick="chartsToggleAllRows(true)">Marcar todas</button>
+                <button type="button" onclick="chartsToggleAllRows(false)">Desmarcar</button>
+              </div>
+            </div>
+            <!-- linhas de períodos preenchidas via JS -->
+          </div>
+
+          <div class="charts-section charts-actions">
+            <button type="button" onclick="chartsDrawChart()">Atualizar gráfico</button>
+            <button type="button" onclick="chartsExportChart()">Exportar gráfico</button>
+            <button type="button" onclick="chartsOpenFullPage()">Abrir em nova aba</button>
+          </div>
+        </div>
+
+        <div id="charts-chart" class="charts-chart">
+          <span>O gráfico será exibido aqui após carregar os dados.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; <span id="anoFooter"></span> Pipeline de RMA</p>
+  </footer>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    // Funções utilitárias para o portal do RMA Pipeline
+    function showSection(sectionId) {
+      var sections = document.querySelectorAll('main section');
+      sections.forEach(function(sec) {
+        if (sec.id === sectionId) {
+          sec.classList.remove('hidden');
+        } else {
+          sec.classList.add('hidden');
+        }
+      });
+      if (sectionId === 'graficos') {
+        initChartsPanel();
+        stopRelatoriosQueue();
+      } else if (sectionId === 'relatorios') {
+        initRelatoriosQueue();
+      } else if (sectionId === 'grupos') {
+        initCadastrosManager();
+        stopRelatoriosQueue();
+      } else {
+        stopRelatoriosQueue();
+      }
+    }
+    // Atualiza o rodapé com o ano atual e mostra a primeira seção
+    document.addEventListener('DOMContentLoaded', function() {
+      var yearSpan = document.getElementById('anoFooter');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+      showSection('entrada');
+      // Carrega listas iniciais para relatórios
+      loadTemplates();
+      loadEmpresas();
+      loadGrupos();
+    });
+    // Callback genérica
+    function onSuccess(message) {
+      if (message) {
+        alert(message);
+      }
+    }
+
+    function initRelatoriosQueue() {
+      atualizarFilaRelatorios();
+      if (!filaRelatoriosTimer) {
+        filaRelatoriosTimer = setInterval(atualizarFilaRelatorios, 15000);
+      }
+    }
+
+    function stopRelatoriosQueue() {
+      if (filaRelatoriosTimer) {
+        clearInterval(filaRelatoriosTimer);
+        filaRelatoriosTimer = null;
+      }
+    }
+
+    function atualizarFilaRelatorios() {
+      if (filaRelatoriosLoading) return;
+      filaRelatoriosLoading = true;
+      google.script.run.withSuccessHandler(function(lista) {
+        filaRelatoriosLoading = false;
+        renderizarFilaRelatorios(lista || []);
+      }).listarFilaRelatorios();
+    }
+
+    function renderizarFilaRelatorios(lista) {
+      var tbody = document.getElementById('relatorios-queue-body');
+      if (!tbody) return;
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="6">Nenhum relatório em execução.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      lista.forEach(function(item) {
+        var tr = document.createElement('tr');
+        var tdTipo = document.createElement('td');
+        tdTipo.textContent = item.tipo || '';
+        tr.appendChild(tdTipo);
+
+        var tdEntidade = document.createElement('td');
+        tdEntidade.textContent = item.entidade || '';
+        tr.appendChild(tdEntidade);
+
+        var tdPeriodo = document.createElement('td');
+        tdPeriodo.textContent = item.periodo || '';
+        tr.appendChild(tdPeriodo);
+
+        var tdStatus = document.createElement('td');
+        tdStatus.textContent = item.status || '';
+        if (item.erro) {
+          tdStatus.textContent += ' (' + item.erro + ')';
+        }
+        tr.appendChild(tdStatus);
+
+        var tdProg = document.createElement('td');
+        var barWrap = document.createElement('div');
+        barWrap.className = 'queue-progress';
+        var bar = document.createElement('div');
+        bar.className = 'queue-progress-bar';
+        var pct = Math.max(0, Math.min(100, Number(item.progresso || 0)));
+        bar.style.width = pct + '%';
+        barWrap.appendChild(bar);
+        var label = document.createElement('div');
+        label.className = 'queue-progress-label';
+        label.textContent = pct + '%';
+        tdProg.appendChild(barWrap);
+        tdProg.appendChild(label);
+        tr.appendChild(tdProg);
+
+        var tdArquivo = document.createElement('td');
+        if (item.docUrl && item.doneAt) {
+          var link = document.createElement('a');
+          link.href = item.docUrl;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = 'Abrir';
+          tdArquivo.appendChild(link);
+        }
+        tr.appendChild(tdArquivo);
+
+        tbody.appendChild(tr);
+      });
+    }
+    var chartsLoadRequested = false;
+    var chartsData = null;
+    var chartsLastImageUri = null;
+    var cadastrosData = [];
+    var cadastrosEditMode = false;
+    var cadastrosDeleteMode = false;
+    var cadastrosConfirmDeleteMode = false;
+    var cadastrosDeleteSelection = {};
+    var cadastrosDeleteBaseList = [];
+    var cadastrosSortAsc = true;
+    var filaRelatoriosTimer = null;
+    var filaRelatoriosLoading = false;
+    // Funções que chamam scripts Apps Script
+    function processarEntrada() {
+      alert('Iniciando processamento de entrada...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Processamento de entrada concluído.');
+      }).scanEntrada();
+    }
+    function extrairPendentes() {
+      alert('Iniciando extração de pendentes...');
+      google.script.run.withSuccessHandler(function(concluido) {
+        if (concluido) {
+          alert('Extração de pendentes concluída.');
+        } else {
+          alert('Extração em andamento. Nova execução agendada.');
+        }
+      }).extrairConteudoArquivosPendentes();
+    }
+    function extrairTodos() {
+      alert('Iniciando extração de todos os arquivos...');
+      google.script.run.withSuccessHandler(function(concluido) {
+        if (concluido) {
+          alert('Extração de todos os arquivos concluída.');
+        } else {
+          alert('Extração em andamento. Nova execução agendada.');
+        }
+      }).extrairConteudoNaoProcessado();
+    }
+    function sincronizarCadastros() {
+      alert('Sincronizando cadastros e arquivos...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Sincronização concluída.');
+      }).sincronizarCadastrosEArquivos();
+    }
+    function calcularPercentuais() {
+      alert('Calculando percentuais...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Cálculo de percentuais concluído.');
+      }).calcularPercentuaisDreEBalanco();
+    }
+    function gerarIndicadoresPendentes() {
+      alert('Gerando indicadores pendentes...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Indicadores pendentes gerados.');
+      }).gerarIndicadoresPendentes();
+    }
+    function gerarIndicadoresGruposPendentes() {
+      alert('Gerando indicadores de grupos pendentes...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Indicadores pendentes de grupos gerados.');
+      }).gerarIndicadoresGruposPendentes();
+    }
+    function gerarIndicadoresEmpresaPortal() {
+      var empresa = document.getElementById('indicEmpresaSelect').value;
+      var periodo = document.getElementById('indicPeriodoSelect').value;
+      if (!empresa) {
+        alert('Selecione uma empresa.');
+        return;
+      }
+      if (!periodo) {
+        alert('Selecione um período.');
+        return;
+      }
+      var parts = periodo.split('/');
+      if (parts.length < 2) {
+        alert('Período inválido.');
+        return;
+      }
+      var mes = parseInt(parts[0], 10);
+      var ano = parseInt(parts[1], 10);
+      alert('Gerando indicadores para ' + empresa + ' (' + periodo + ')...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Indicadores gerados para ' + empresa + ' ' + periodo + '.');
+      }).gerarIndicadoresParaEmpresaPeriodo(empresa, mes, ano, false);
+    }
+    function gerarIndicadoresGrupoPortal() {
+      var grupo = document.getElementById('indicGrupoSelect').value;
+      var periodo = document.getElementById('indicGrupoPeriodoSelect').value;
+      if (!grupo) {
+        alert('Selecione um grupo.');
+        return;
+      }
+      if (!periodo) {
+        alert('Selecione um período.');
+        return;
+      }
+      var parts = periodo.split('/');
+      if (parts.length < 2) {
+        alert('Período inválido.');
+        return;
+      }
+      var mes = parseInt(parts[0], 10);
+      var ano = parseInt(parts[1], 10);
+      alert('Gerando indicadores para o grupo ' + grupo + ' (' + periodo + ')...');
+      google.script.run.withSuccessHandler(function() {
+        alert('Indicadores gerados para o grupo ' + grupo + ' ' + periodo + '.');
+      }).gerarIndicadoresParaGrupoPeriodo(grupo, mes, ano, false);
+    }
+    function initChartsPanel() {
+      if (chartsData) {
+        chartsDrawChart();
+        return;
+      }
+      if (!chartsLoadRequested) {
+        chartsLoadRequested = true;
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(fetchChartsData);
+      }
+    }
+    function fetchChartsData() {
+      google.script.run.withSuccessHandler(function(data) {
+        chartsData = data;
+        chartsBuildUI(data);
+      }).getIndicadoresData();
+    }
+    function chartsBuildUI(data) {
+      chartsBuildIndicators(data.indicators || []);
+      chartsBuildRows(data.rows || []);
+      chartsDrawChart();
+    }
+    function chartsBuildIndicators(indicators) {
+      var container = document.getElementById('charts-indicators-section');
+      if (!container) return;
+      container.querySelectorAll('.charts-indicator-row').forEach(function(el) { el.remove(); });
+      indicators.forEach(function(ind) {
+        var id = chartsEscapeId(ind);
+        var row = document.createElement('div');
+        row.className = 'charts-indicator-row charts-inline';
+        row.innerHTML = ''
+          + '<label><input type="checkbox" class="charts-indicator-check" data-ind="' + id + '" checked> ' + ind + '</label>'
+          + '<label>Rótulo:<input type="text" data-type="serie-label" data-ind="' + id + '" value="' + ind + '"></label>'
+          + '<label>Cor:<input type="color" data-type="serie-color" data-ind="' + id + '"></label>';
+        container.appendChild(row);
+      });
+    }
+    function chartsBuildRows(rows) {
+      var container = document.getElementById('charts-rows-section');
+      if (!container) return;
+      container.querySelectorAll('.charts-row-entry').forEach(function(el) { el.remove(); });
+      rows.forEach(function(r, idx) {
+        var label = (r.empresa || 'Entidade') + ' ' + (r.mes || '-') + '/' + (r.ano || '-');
+        var row = document.createElement('div');
+        row.className = 'charts-row-entry';
+        row.innerHTML = '<label><input type="checkbox" class="charts-row-check" data-row="' + idx + '" checked> ' + label + '</label>';
+        container.appendChild(row);
+      });
+    }
+    function chartsEscapeId(str) {
+      return String(str || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+    function chartsGetSelectedIndicators() {
+      return Array.from(document.querySelectorAll('.charts-indicator-check:checked'))
+        .map(function(chk) { return chk.getAttribute('data-ind'); });
+    }
+    function chartsGetSelectedRows() {
+      return Array.from(document.querySelectorAll('.charts-row-check:checked'))
+        .map(function(chk) { return parseInt(chk.getAttribute('data-row'), 10); });
+    }
+    function chartsToggleAllSeries(marcar) {
+      document.querySelectorAll('.charts-indicator-check').forEach(function(chk) {
+        chk.checked = marcar;
+      });
+      chartsDrawChart();
+    }
+    function chartsToggleAllRows(marcar) { 
+      document.querySelectorAll('.charts-row-check').forEach(function(chk) { 
+        chk.checked = marcar; 
+      }); 
+      chartsDrawChart(); 
+    } 
+    function chartsBuildQuickChartConfig(title, labels, series, colors) {
+      var datasets = series.map(function(serie, idx) {
+        return {
+          label: serie.label,
+          data: serie.data,
+          backgroundColor: colors && colors[idx] ? colors[idx] : undefined,
+          borderWidth: 0
+        };
+      });
+      return {
+        type: 'bar',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: !!title, text: title }
+          },
+          scales: {
+            x: { ticks: { autoSkip: false } },
+            y: { beginAtZero: false }
+          }
+        }
+      };
+    }
+    function chartsDrawChart() { 
+      if (!chartsData || !google.visualization) return; 
+      var indIds = chartsGetSelectedIndicators(); 
+      var rowIdxs = chartsGetSelectedRows(); 
+      if (!indIds.length || !rowIdxs.length) return; 
+      var dataTable = new google.visualization.DataTable();
+      dataTable.addColumn('string', 'Entidade');
+      var colors = [];
+      indIds.forEach(function(id) {
+        var originalName = (chartsData.indicators || []).find(function(ind) {
+          return chartsEscapeId(ind) === id;
+        }) || id;
+        var labelInput = document.querySelector('input[data-type="serie-label"][data-ind="' + id + '"]');
+        var colorInput = document.querySelector('input[data-type="serie-color"][data-ind="' + id + '"]');
+        var label = (labelInput && labelInput.value.trim()) || originalName;
+        dataTable.addColumn('number', label);
+        if (colorInput && colorInput.value) {
+          colors.push(colorInput.value);
+        }
+      });
+      var rows = [];
+      rowIdxs.forEach(function(idx) { 
+        var r = chartsData.rows[idx]; 
+        if (!r) return; 
+        var label = (r.empresa || 'Entidade') + ' ' + (r.mes || '-') + '/' + (r.ano || '-'); 
+        var row = [label]; 
+        indIds.forEach(function(id) { 
+          var originalName = (chartsData.indicators || []).find(function(ind) { 
+            return chartsEscapeId(ind) === id; 
+          }) || id; 
+          var value = Number((r.values && r.values[originalName]) || 0);  
+          row.push(isNaN(value) ? null : value);  
+        });  
+        rows.push(row);  
+      });  
+      if (!rows.length) return;  
+      var labels = rows.map(function(r) { return r[0]; });
+      var series = indIds.map(function(id, idx) { 
+        var originalName = (chartsData.indicators || []).find(function(ind) { 
+          return chartsEscapeId(ind) === id; 
+        }) || id; 
+        var labelInput = document.querySelector('input[data-type="serie-label"][data-ind="' + id + '"]'); 
+        var label = (labelInput && labelInput.value.trim()) || originalName; 
+        var data = rows.map(function(r) { return r[idx + 1]; }); 
+        return { label: label, data: data }; 
+      }); 
+      dataTable.addRows(rows);  
+      var title = document.getElementById('charts-title-input').value || 'Indicadores'; 
+      var titleFont = parseInt(document.getElementById('charts-title-font').value || '18', 10); 
+      var axisFont = parseInt(document.getElementById('charts-axis-font').value || '10', 10); 
+      var chartDiv = document.getElementById('charts-chart'); 
+      if (!chartDiv) return;
+      var containerWidth = chartDiv.clientWidth || (chartDiv.parentElement ? chartDiv.parentElement.clientWidth : 400) || 400;
+      var width = containerWidth;
+      var height = Math.round(width * 9 / 16);
+      var options = {
+        title: title,
+        legend: { position: 'top' },
+        width: width,
+        height: height,
+        chartArea: { left: '15%', top: 40, width: '75%', height: '60%' },
+        colors: colors.length ? colors : undefined,
+        titleTextStyle: { fontSize: titleFont },
+        hAxis: { textStyle: { fontSize: axisFont } },
+        vAxis: { textStyle: { fontSize: axisFont } },
+        bar: { groupWidth: '70%' }
+      }; 
+      var chart = new google.visualization.ColumnChart(chartDiv); 
+      google.visualization.events.addListener(chart, 'ready', function() { 
+        try { 
+          var qcConfig = chartsBuildQuickChartConfig(title, labels, series, colors);
+          chartsLastImageUri = 'https://quickchart.io/chart?w=' + width + '&h=' + height + '&c=' + encodeURIComponent(JSON.stringify(qcConfig));
+        } catch (err) { 
+          chartsLastImageUri = null; 
+        } 
+      }); 
+      chart.draw(dataTable, options); 
+    }
+    function chartsExportChart() {
+      if (!chartsLastImageUri) {
+        alert('Desenhe o gráfico antes de exportar.');
+        return;
+      }
+      var win = window.open();
+      win.document.write('<img src="' + chartsLastImageUri + '" style="max-width:100%;">');
+    }
+    function chartsOpenFullPage() {
+      google.script.run.withSuccessHandler(function(url) {
+        if (!url) {
+          alert('Web App ainda não está publicado. Publique o script como Web App para continuar.');
+          return;
+        }
+        window.open(url, '_blank');
+      }).getWebAppUrl();
+    }
+    function initCadastrosManager() {
+      carregarCadastrosPortal();
+    }
+
+    function toggleCadastrosActions() {
+      var editBtn = document.getElementById('cadastros-edit-btn');
+      var deleteBtn = document.getElementById('cadastros-delete-btn');
+      var cancelBtn = document.getElementById('cadastros-cancel-btn');
+      var saveBtn = document.getElementById('cadastros-save-btn');
+      var cancelDeleteBtn = document.getElementById('cadastros-cancel-delete-btn');
+      var confirmDeleteBtn = document.getElementById('cadastros-confirm-delete-btn');
+      if (!editBtn || !deleteBtn || !cancelBtn || !saveBtn || !cancelDeleteBtn || !confirmDeleteBtn) return;
+      if (cadastrosEditMode) {
+        editBtn.classList.add('hidden');
+        deleteBtn.classList.add('hidden');
+        cancelBtn.classList.remove('hidden');
+        saveBtn.classList.remove('hidden');
+        cancelDeleteBtn.classList.add('hidden');
+        confirmDeleteBtn.classList.add('hidden');
+      } else if (cadastrosDeleteMode) {
+        editBtn.classList.add('hidden');
+        deleteBtn.classList.add('hidden');
+        cancelBtn.classList.add('hidden');
+        saveBtn.classList.add('hidden');
+        cancelDeleteBtn.classList.remove('hidden');
+        if (cadastrosConfirmDeleteMode) {
+          confirmDeleteBtn.classList.add('hidden');
+        } else {
+          confirmDeleteBtn.classList.remove('hidden');
+        }
+        atualizarContadorExclusao();
+      } else {
+        editBtn.classList.remove('hidden');
+        deleteBtn.classList.remove('hidden');
+        cancelBtn.classList.add('hidden');
+        saveBtn.classList.add('hidden');
+        cancelDeleteBtn.classList.add('hidden');
+        confirmDeleteBtn.classList.add('hidden');
+      }
+      var deleteActions = document.getElementById('cadastros-delete-actions');
+      if (deleteActions) {
+        if (cadastrosDeleteMode && cadastrosConfirmDeleteMode) {
+          deleteActions.classList.remove('hidden');
+        } else {
+          deleteActions.classList.add('hidden');
+        }
+      }
+      var tableWrap = document.querySelector('#grupos .cadastro-table');
+      if (tableWrap) {
+        if (cadastrosDeleteMode && cadastrosConfirmDeleteMode) {
+          tableWrap.classList.add('cadastros-confirm-delete');
+        } else {
+          tableWrap.classList.remove('cadastros-confirm-delete');
+        }
+      }
+    }
+
+    function atualizarContadorExclusao() {
+      var btn = document.getElementById('cadastros-confirm-delete-btn');
+      if (!btn) return;
+      var count = Object.keys(cadastrosDeleteSelection || {}).length;
+      btn.textContent = 'Confirmar exclusão' + (count ? ' (' + count + ')' : '');
+    }
+
+    function atualizarLabelOrdenacaoCadastros() {
+      var btn = document.getElementById('cadastros-sort-toggle');
+      if (!btn) return;
+      btn.textContent = cadastrosSortAsc ? 'A-Z' : 'Z-A';
+    }
+
+    function toggleOrdenacaoCadastros() {
+      cadastrosSortAsc = !cadastrosSortAsc;
+      atualizarLabelOrdenacaoCadastros();
+      renderizarCadastros();
+    }
+
+    function entrarEdicaoCadastros() {
+      cadastrosEditMode = true;
+      cadastrosDeleteMode = false;
+      cadastrosConfirmDeleteMode = false;
+      cadastrosDeleteSelection = {};
+      toggleCadastrosActions();
+      renderizarCadastros();
+    }
+
+    function cancelarEdicaoCadastros() {
+      cadastrosEditMode = false;
+      toggleCadastrosActions();
+      renderizarCadastros();
+    }
+
+    function entrarExclusaoCadastros() {
+      cadastrosEditMode = false;
+      cadastrosDeleteMode = true;
+      cadastrosConfirmDeleteMode = false;
+      cadastrosDeleteSelection = {};
+      toggleCadastrosActions();
+      renderizarCadastros();
+    }
+
+    function cancelarExclusaoCadastros() {
+      cadastrosDeleteMode = false;
+      cadastrosConfirmDeleteMode = false;
+      cadastrosDeleteSelection = {};
+      toggleCadastrosActions();
+      renderizarCadastros();
+    }
+
+    function confirmarExclusaoCadastros() {
+      var selecionados = Object.keys(cadastrosDeleteSelection || {});
+      if (!selecionados.length) {
+        alert('Selecione ao menos um cadastro para excluir.');
+        return;
+      }
+      cadastrosConfirmDeleteMode = true;
+      toggleCadastrosActions();
+      renderizarCadastros();
+    }
+
+    function carregarCadastrosPortal() {
+      var tbody = document.getElementById('cadastros-table-body');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="7">Carregando cadastros...</td></tr>';
+      }
+      google.script.run.withSuccessHandler(function(lista) {
+        cadastrosData = lista || [];
+        cadastrosEditMode = false;
+        cadastrosDeleteMode = false;
+        cadastrosConfirmDeleteMode = false;
+        cadastrosDeleteSelection = {};
+        toggleCadastrosActions();
+        atualizarLabelOrdenacaoCadastros();
+        renderizarCadastros();
+      }).listarCadastrosDetalhados();
+    }
+
+    function compararTextoCadastro(a, b, asc) {
+      var aVal = String(a || '').toLowerCase();
+      var bVal = String(b || '').toLowerCase();
+      if (aVal === '' && bVal === '') return 0;
+      if (aVal === '') return asc ? 1 : -1;
+      if (bVal === '') return asc ? -1 : 1;
+      var cmp = aVal.localeCompare(bVal);
+      return asc ? cmp : -cmp;
+    }
+
+    function ordemDocumentoCadastro(doc) {
+      var norm = String(doc || '').toLowerCase();
+      if (norm.indexOf('balan') === 0) return 1;
+      if (norm === 'dre') return 2;
+      return 3;
+    }
+
+    function ordenarCadastros(lista) {
+      var asc = cadastrosSortAsc;
+      return (lista || []).slice().sort(function(a, b) {
+        var cmp = compararTextoCadastro(a.grupo, b.grupo, asc);
+        if (cmp !== 0) return cmp;
+        cmp = compararTextoCadastro(a.empresa, b.empresa, asc);
+        if (cmp !== 0) return cmp;
+        var keyA = (a.ano || 0) * 12 + (a.mes || 0);
+        var keyB = (b.ano || 0) * 12 + (b.mes || 0);
+        if (keyA !== keyB) return keyA - keyB;
+        return ordemDocumentoCadastro(a.documento) - ordemDocumentoCadastro(b.documento);
+      });
+    }
+
+    function agruparCadastros(lista) {
+      var grupos = [];
+      var gruposMap = {};
+      (lista || []).forEach(function(item) {
+        var grupoKey = item.grupo || '';
+        var empresaKey = item.empresa || '';
+        var periodoKey = item.periodo || '';
+        if (!gruposMap[grupoKey]) {
+          gruposMap[grupoKey] = { grupo: grupoKey, empresas: [], _empMap: {} };
+          grupos.push(gruposMap[grupoKey]);
+        }
+        var grupo = gruposMap[grupoKey];
+        if (!grupo._empMap[empresaKey]) {
+          grupo._empMap[empresaKey] = { empresa: empresaKey, periodos: [], _perMap: {} };
+          grupo.empresas.push(grupo._empMap[empresaKey]);
+        }
+        var empresa = grupo._empMap[empresaKey];
+        if (!empresa._perMap[periodoKey]) {
+          empresa._perMap[periodoKey] = {
+            periodo: periodoKey,
+            mes: item.mes,
+            ano: item.ano,
+            docs: [],
+            indicadores: item.indicadores || ''
+          };
+          empresa.periodos.push(empresa._perMap[periodoKey]);
+        }
+        var periodo = empresa._perMap[periodoKey];
+        if (item.indicadores) {
+          periodo.indicadores = item.indicadores;
+        }
+        periodo.docs.push(item);
+      });
+      grupos.forEach(function(grupo) {
+        grupo.rowSpan = 0;
+        grupo.empresas.forEach(function(empresa) {
+          empresa.rowSpan = 0;
+          empresa.periodos.forEach(function(periodo) {
+            periodo.rowSpan = Math.max(1, periodo.docs.length || 1);
+            empresa.rowSpan += periodo.rowSpan;
+          });
+          grupo.rowSpan += empresa.rowSpan;
+        });
+        delete grupo._empMap;
+        grupo.empresas.forEach(function(empresa) { delete empresa._perMap; });
+      });
+      return grupos;
+    }
+
+    function criarCelulaTextoCadastro(texto, classe, rowSpan) {
+      var td = document.createElement('td');
+      if (classe) td.className = classe;
+      if (rowSpan && rowSpan > 1) td.rowSpan = rowSpan;
+      td.textContent = texto || '';
+      return td;
+    }
+
+    function criarCelulaInputCadastro(valor, classe, rowSpan) {
+      var td = document.createElement('td');
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.value = valor || '';
+      input.className = 'cadastro-input ' + (classe || '');
+      if (rowSpan && rowSpan > 1) td.rowSpan = rowSpan;
+      td.appendChild(input);
+      return td;
+    }
+
+    function criarCelulaCheckboxCadastro(label, level, dataAttrs, rowSpan, state) {
+      var td = document.createElement('td');
+      if (rowSpan && rowSpan > 1) td.rowSpan = rowSpan;
+      var input = document.createElement('input');
+      input.type = 'checkbox';
+      input.setAttribute('data-level', level);
+      Object.keys(dataAttrs || {}).forEach(function(k) {
+        if (dataAttrs[k] != null) input.setAttribute('data-' + k, dataAttrs[k]);
+      });
+      if (state && state.checked) input.checked = true;
+      if (state && state.indeterminate) input.indeterminate = true;
+      input.addEventListener('change', onCadastroCheckboxChange);
+      var span = document.createElement('span');
+      span.textContent = ' ' + (label || '');
+      td.appendChild(input);
+      td.appendChild(span);
+      return td;
+    }
+
+    function getCadastroDocKey(doc) {
+      var fileId = doc.fileId || '';
+      if (fileId) return 'file:' + fileId;
+      return [doc.grupo || '', doc.empresa || '', doc.periodo || '', doc.documento || ''].join('|');
+    }
+
+    function construirMapasExclusao(lista) {
+      var maps = {
+        groupDocs: {},
+        empresaDocs: {},
+        periodoDocs: {},
+        docMeta: {},
+        docByKey: {}
+      };
+      (lista || []).forEach(function(doc) {
+        var docKey = getCadastroDocKey(doc);
+        var groupKey = doc.grupo || '';
+        var empresaKey = doc.empresa || '';
+        var periodoKey = doc.periodo || '';
+        var empresaId = groupKey + '||' + empresaKey;
+        var periodoId = empresaId + '||' + periodoKey;
+        if (!maps.groupDocs[groupKey]) maps.groupDocs[groupKey] = [];
+        if (!maps.empresaDocs[empresaId]) maps.empresaDocs[empresaId] = [];
+        if (!maps.periodoDocs[periodoId]) maps.periodoDocs[periodoId] = [];
+        maps.groupDocs[groupKey].push(docKey);
+        maps.empresaDocs[empresaId].push(docKey);
+        maps.periodoDocs[periodoId].push(docKey);
+        maps.docMeta[docKey] = { groupKey: groupKey, empresaId: empresaId, periodoId: periodoId, periodoKey: periodoKey };
+        maps.docByKey[docKey] = doc;
+      });
+      return maps;
+    }
+
+    function calcSelectionState(docKeys) {
+      var total = (docKeys || []).length;
+      if (!total) return { checked: false, indeterminate: false };
+      var selected = 0;
+      docKeys.forEach(function(k) {
+        if (cadastrosDeleteSelection[k]) selected++;
+      });
+      if (selected === 0) return { checked: false, indeterminate: false };
+      if (selected === total) return { checked: true, indeterminate: false };
+      return { checked: false, indeterminate: true };
+    }
+
+    function setSelectionForDocs(docKeys, checked) {
+      (docKeys || []).forEach(function(k) {
+        if (checked) {
+          cadastrosDeleteSelection[k] = true;
+        } else {
+          delete cadastrosDeleteSelection[k];
+        }
+      });
+    }
+
+    function onCadastroCheckboxChange(ev) {
+      var input = ev.target;
+      var level = input.getAttribute('data-level');
+      var groupKey = input.getAttribute('data-group-key') || '';
+      var empresaKey = input.getAttribute('data-empresa-key') || '';
+      var periodoKey = input.getAttribute('data-periodo-key') || '';
+      var docKey = input.getAttribute('data-doc-key') || '';
+      var maps = construirMapasExclusao(cadastrosDeleteBaseList || []);
+      if (level === 'group') {
+        setSelectionForDocs(maps.groupDocs[groupKey] || [], input.checked);
+      } else if (level === 'empresa') {
+        var empresaId = groupKey + '||' + empresaKey;
+        setSelectionForDocs(maps.empresaDocs[empresaId] || [], input.checked);
+      } else if (level === 'periodo') {
+        var periodoId = groupKey + '||' + empresaKey + '||' + periodoKey;
+        setSelectionForDocs(maps.periodoDocs[periodoId] || [], input.checked);
+      } else if (level === 'doc') {
+        setSelectionForDocs([docKey], input.checked);
+      }
+      atualizarContadorExclusao();
+      renderizarCadastros();
+    }
+
+    function renderizarCadastros() {
+      var tbody = document.getElementById('cadastros-table-body');
+      if (!tbody) return;
+      var baseList = ordenarCadastros(cadastrosData);
+      if (cadastrosDeleteMode && cadastrosConfirmDeleteMode) {
+        baseList = baseList.filter(function(d) {
+          return cadastrosDeleteSelection[getCadastroDocKey(d)];
+        });
+      }
+      var ordenados = baseList;
+      if (!ordenados.length) {
+        tbody.innerHTML = '<tr><td colspan="7">Nenhum cadastro encontrado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      cadastrosDeleteBaseList = ordenados;
+      var grupos = agruparCadastros(ordenados);
+      var maps = cadastrosDeleteMode ? construirMapasExclusao(ordenados) : null;
+      grupos.forEach(function(grupo) {
+        var grupoRenderizado = false;
+        grupo.empresas.forEach(function(empresa) {
+          var empresaRenderizada = false;
+          empresa.periodos.forEach(function(periodo) {
+            var periodoRenderizado = false;
+            periodo.docs.forEach(function(doc) {
+              var tr = document.createElement('tr');
+              tr.setAttribute('data-empresa-original', doc.empresa || '');
+              tr.setAttribute('data-grupo-original', doc.grupo || '');
+              if (cadastrosEditMode) {
+                if (!empresaRenderizada) {
+                  tr.appendChild(criarCelulaInputCadastro(doc.grupo, 'cadastro-grupo-input', empresa.rowSpan));
+                  tr.appendChild(criarCelulaInputCadastro(doc.empresa, 'cadastro-empresa-input', empresa.rowSpan));
+                  empresaRenderizada = true;
+                }
+              } else if (cadastrosDeleteMode && !cadastrosConfirmDeleteMode) {
+                if (!grupoRenderizado) {
+                  var groupState = calcSelectionState(maps.groupDocs[doc.grupo || ''] || []);
+                  tr.appendChild(criarCelulaCheckboxCadastro(doc.grupo, 'group', { 'group-key': doc.grupo || '' }, grupo.rowSpan, groupState));
+                  grupoRenderizado = true;
+                }
+                if (!empresaRenderizada) {
+                  var empresaId = (doc.grupo || '') + '||' + (doc.empresa || '');
+                  var empresaState = calcSelectionState(maps.empresaDocs[empresaId] || []);
+                  tr.appendChild(criarCelulaCheckboxCadastro(doc.empresa, 'empresa', { 'group-key': doc.grupo || '', 'empresa-key': doc.empresa || '' }, empresa.rowSpan, empresaState));
+                  empresaRenderizada = true;
+                }
+              } else {
+                if (!grupoRenderizado) {
+                  tr.appendChild(criarCelulaTextoCadastro(doc.grupo, 'cadastro-group-cell', grupo.rowSpan));
+                  grupoRenderizado = true;
+                }
+                if (!empresaRenderizada) {
+                  tr.appendChild(criarCelulaTextoCadastro(doc.empresa, 'cadastro-empresa-cell', empresa.rowSpan));
+                  empresaRenderizada = true;
+                }
+              }
+              if (!periodoRenderizado) {
+                if (cadastrosDeleteMode && !cadastrosConfirmDeleteMode) {
+                  var periodoId = (doc.grupo || '') + '||' + (doc.empresa || '') + '||' + (doc.periodo || '');
+                  var periodoState = calcSelectionState(maps.periodoDocs[periodoId] || []);
+                  tr.appendChild(criarCelulaCheckboxCadastro(doc.periodo, 'periodo', { 'group-key': doc.grupo || '', 'empresa-key': doc.empresa || '', 'periodo-key': doc.periodo || '' }, periodo.rowSpan, periodoState));
+                } else {
+                  tr.appendChild(criarCelulaTextoCadastro(doc.periodo, '', periodo.rowSpan));
+                }
+              }
+              if (cadastrosDeleteMode && !cadastrosConfirmDeleteMode) {
+                var docKey = getCadastroDocKey(doc);
+                var docChecked = !!cadastrosDeleteSelection[docKey];
+                tr.appendChild(criarCelulaCheckboxCadastro(doc.documento, 'doc', { 'group-key': doc.grupo || '', 'empresa-key': doc.empresa || '', 'periodo-key': doc.periodo || '', 'doc-key': docKey }, null, { checked: docChecked }));
+              } else {
+                tr.appendChild(criarCelulaTextoCadastro(doc.documento, '', null));
+              }
+              var arquivoTd = document.createElement('td');
+              arquivoTd.className = 'cadastro-arquivo-cell';
+              if (doc.fileId) {
+                var link = document.createElement('a');
+                link.href = 'https://drive.google.com/open?id=' + encodeURIComponent(doc.fileId);
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.textContent = doc.fileName || doc.fileId;
+                arquivoTd.appendChild(link);
+              } else {
+                arquivoTd.textContent = doc.fileName || '';
+              }
+              tr.appendChild(arquivoTd);
+              tr.appendChild(criarCelulaTextoCadastro(doc.status, 'cadastro-status-cell', null));
+              if (!periodoRenderizado) {
+                tr.appendChild(criarCelulaTextoCadastro(periodo.indicadores || '', 'cadastro-indicadores-cell', periodo.rowSpan));
+              }
+              periodoRenderizado = true;
+              tbody.appendChild(tr);
+            });
+          });
+        });
+      });
+    }
+
+    function salvarCadastrosPortal() {
+      var tbody = document.getElementById('cadastros-table-body');
+      if (!tbody) return;
+      var linhas = tbody.querySelectorAll('tr[data-empresa-original]');
+      if (!linhas.length) {
+        alert('Nenhum cadastro para salvar.');
+        return;
+      }
+      var ajustesMap = {};
+      linhas.forEach(function(tr) {
+        var empresaInput = tr.querySelector('.cadastro-empresa-input');
+        var grupoInput = tr.querySelector('.cadastro-grupo-input');
+        if (!empresaInput) return;
+        var original = tr.getAttribute('data-empresa-original') || '';
+        if (!original || ajustesMap[original]) return;
+        var grupoOriginal = tr.getAttribute('data-grupo-original') || '';
+        var grupo = grupoInput ? grupoInput.value.trim() : grupoOriginal;
+        var empresa = empresaInput.value.trim();
+        ajustesMap[original] = {
+          empresaOriginal: original,
+          empresaNova: empresa || original,
+          grupo: grupo
+        };
+      });
+      var ajustes = Object.keys(ajustesMap).map(function(key) { return ajustesMap[key]; });
+      if (!ajustes.length) {
+        alert('Nenhuma alteracao encontrada.');
+        return;
+      }
+      google.script.run.withSuccessHandler(function() {
+        alert('Cadastros atualizados com sucesso.');
+        cadastrosEditMode = false;
+        toggleCadastrosActions();
+        carregarCadastrosPortal();
+      }).salvarCadastros(ajustes);
+    }
+
+    function executarExclusaoCadastros() {
+      var selecionados = Object.keys(cadastrosDeleteSelection || {});
+      if (!selecionados.length) {
+        alert('Nenhum cadastro selecionado para exclusão.');
+        return;
+      }
+      var docs = (cadastrosDeleteBaseList || []).filter(function(d) {
+        return cadastrosDeleteSelection[getCadastroDocKey(d)];
+      }).map(function(d) {
+        return {
+          grupo: d.grupo || '',
+          empresa: d.empresa || '',
+          mes: d.mes,
+          ano: d.ano,
+          periodo: d.periodo,
+          documento: d.documento,
+          fileId: d.fileId || ''
+        };
+      });
+      google.script.run.withSuccessHandler(function(resp) {
+        alert('Exclusão concluída.');
+        cadastrosDeleteMode = false;
+        cadastrosConfirmDeleteMode = false;
+        cadastrosDeleteSelection = {};
+        toggleCadastrosActions();
+        carregarCadastrosPortal();
+      }).excluirCadastrosSelecionados(docs);
+    }
+
+    function preencherSelect(selectEl, itens) {
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = 'Selecione...';
+      selectEl.appendChild(opt0);
+      (itens || []).forEach(function(item) {
+        var opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectEl.appendChild(opt);
+      });
+    }
+    // Carrega modelos de relatório para os combos (individual e grupo)
+    function loadTemplates() {
+      google.script.run.withSuccessHandler(function(modelos) {
+        var indSel = document.getElementById('templateIndSelect');
+        var grpSel = document.getElementById('templateGrpSelect');
+        // Limpa opções existentes
+        indSel.innerHTML = '';
+        grpSel.innerHTML = '';
+        // Adiciona opção vazia
+        var opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = 'Selecione...';
+        indSel.appendChild(opt0.cloneNode(true));
+        grpSel.appendChild(opt0.cloneNode(true));
+        modelos.forEach(function(m) {
+          // m: {nome, id, suportaGrupo}
+          var opt = document.createElement('option');
+          opt.value = m.id;
+          opt.textContent = m.nome;
+          indSel.appendChild(opt.cloneNode(true));
+          if (m.suportaGrupo) {
+            grpSel.appendChild(opt);
+          }
+        });
+      }).getRelatorioModelos();
+    }
+    // Carrega lista de empresas
+    function loadEmpresas() {
+      google.script.run.withSuccessHandler(function(empresas) {
+        preencherSelect(document.getElementById('empresaIndSelect'), empresas);
+        preencherSelect(document.getElementById('indicEmpresaSelect'), empresas);
+      }).getEmpresasDisponiveis();
+    }
+    // Carrega lista de grupos
+    function loadGrupos() {
+      google.script.run.withSuccessHandler(function(grupos) {
+        preencherSelect(document.getElementById('grupoGrpSelect'), grupos);
+        preencherSelect(document.getElementById('indicGrupoSelect'), grupos);
+      }).getGruposDisponiveis();
+    }
+    // Quando empresa é alterada, atualiza lista de períodos
+    function empresaChanged() {
+      var empSel = document.getElementById('empresaIndSelect');
+      var empresa = empSel.value;
+      var periodoSel = document.getElementById('periodoIndSelect');
+      periodoSel.innerHTML = '';
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = 'Selecione...';
+      periodoSel.appendChild(opt0);
+      if (!empresa) return;
+      google.script.run.withSuccessHandler(function(periodos) {
+        periodos.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          periodoSel.appendChild(opt);
+        });
+      }).getPeriodosDisponiveisParaEmpresa(empresa);
+    }
+    // Quando grupo é alterado, atualiza lista de períodos
+    function grupoChanged() {
+      var grpSel = document.getElementById('grupoGrpSelect');
+      var grupo = grpSel.value;
+      var periodoSel = document.getElementById('periodoGrpSelect');
+      periodoSel.innerHTML = '';
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = 'Selecione...';
+      periodoSel.appendChild(opt0);
+      if (!grupo) return;
+      google.script.run.withSuccessHandler(function(periodos) {
+        periodos.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          periodoSel.appendChild(opt);
+        });
+      }).getPeriodosDisponiveisParaGrupo(grupo);
+    }
+    function indicEmpresaChanged() {
+      var empresa = document.getElementById('indicEmpresaSelect').value;
+      var periodoSel = document.getElementById('indicPeriodoSelect');
+      if (!periodoSel) return;
+      periodoSel.innerHTML = '';
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = 'Selecione...';
+      periodoSel.appendChild(opt0);
+      if (!empresa) return;
+      google.script.run.withSuccessHandler(function(periodos) {
+        periodos.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          periodoSel.appendChild(opt);
+        });
+      }).getPeriodosDisponiveisParaEmpresa(empresa);
+    }
+    function indicGrupoChanged() {
+      var grupo = document.getElementById('indicGrupoSelect').value;
+      var periodoSel = document.getElementById('indicGrupoPeriodoSelect');
+      if (!periodoSel) return;
+      periodoSel.innerHTML = '';
+      var opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = 'Selecione...';
+      periodoSel.appendChild(opt0);
+      if (!grupo) return;
+      google.script.run.withSuccessHandler(function(periodos) {
+        periodos.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          periodoSel.appendChild(opt);
+        });
+      }).getPeriodosDisponiveisParaGrupo(grupo);
+    }
+    // Gera relatório individual a partir dos selects
+    function gerarRelatorioIndividualPortal() {
+      var templateId = document.getElementById('templateIndSelect').value;
+      var empresa = document.getElementById('empresaIndSelect').value;
+      var periodo = document.getElementById('periodoIndSelect').value;
+      if (!templateId) {
+        alert('Selecione um template.');
+        return;
+      }
+      if (!empresa) {
+        alert('Selecione uma empresa.');
+        return;
+      }
+      if (!periodo) {
+        alert('Selecione um período.');
+        return;
+      }
+      var parts = periodo.split('/');
+      if (parts.length < 2) {
+        alert('Período inválido.');
+        return;
+      }
+      var mes = parseInt(parts[0], 10);
+      var ano = parseInt(parts[1], 10);
+      alert('Gerando relatório individual para ' + empresa + '...');
+      google.script.run.exportarRelatorioIndividualParaEmpresaComModelo(empresa, mes, ano, templateId);
+    }
+    // Gera relatório de grupo a partir dos selects
+    function gerarRelatorioGrupoPortal() {
+      var templateId = document.getElementById('templateGrpSelect').value;
+      var grupo = document.getElementById('grupoGrpSelect').value;
+      var periodo = document.getElementById('periodoGrpSelect').value;
+      if (!templateId) {
+        alert('Selecione um template.');
+        return;
+      }
+      if (!grupo) {
+        alert('Selecione um grupo.');
+        return;
+      }
+      if (!periodo) {
+        alert('Selecione um período.');
+        return;
+      }
+      var parts = periodo.split('/');
+      if (parts.length < 2) {
+        alert('Período inválido.');
+        return;
+      }
+      var mes = parseInt(parts[0], 10);
+      var ano = parseInt(parts[1], 10);
+      alert('Gerando relatório de grupo para ' + grupo + '...');
+      google.script.run.exportarRelatorioGrupoParaGrupoComModelo(grupo, mes, ano, templateId);
+    }
+    window.addEventListener('resize', function() {
+      chartsDrawChart();
+    });
+  </script>
+</body>
+</html>

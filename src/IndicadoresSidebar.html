@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 8px; }
+      #layout { display: flex; flex-direction: column; height: 100vh; }
+      #controls { flex: 0 0 auto; overflow-y: auto; max-height: 45vh; }
+      #chart { flex: 0 0 auto; }
+      .section { margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+      .section h3 { margin: 4px 0; font-size: 12px; text-transform: uppercase; }
+      .inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .indicator-row, .row-row { font-size: 11px; margin-top: 2px; }
+      .indicator-row input[type="text"] { width: 120px; }
+      button { font-size: 10px; padding: 2px 6px; }
+    </style>
+  </head>
+  <body>
+    <div id="layout">
+      <div id="controls">
+        <div class="section">
+          <h3>Título e fonte</h3>
+          <div class="inline">
+            <label>Título:
+              <input id="title-input" type="text" value="Indicadores">
+            </label>
+            <label>Fonte título:
+              <input id="title-font-size" type="number" value="18" min="8" max="40">
+            </label>
+            <label>Fonte eixos:
+              <input id="axis-font-size" type="number" value="10" min="6" max="24">
+            </label>
+          </div>
+        </div>
+
+        <div class="section" id="indicators-section">
+          <div class="inline">
+            <h3 style="margin-right:auto;">Indicadores (séries)</h3>
+            <button type="button" onclick="toggleAllSeries(true)">Marcar todos</button>
+            <button type="button" onclick="toggleAllSeries(false)">Desmarcar todos</button>
+          </div>
+          <!-- linhas de indicadores preenchidas via JS -->
+        </div>
+
+        <div class="section" id="rows-section">
+          <div class="inline">
+            <h3 style="margin-right:auto;">Linhas (empresa/período)</h3>
+            <button type="button" onclick="toggleAllRows(true)">Marcar todas</button>
+            <button type="button" onclick="toggleAllRows(false)">Desmarcar todas</button>
+          </div>
+          <!-- linhas de períodos preenchidas via JS -->
+        </div>
+
+        <div class="section inline">
+          <button type="button" onclick="drawChart()">Atualizar gráfico</button>
+          <button type="button" onclick="exportChart()">Exportar gráfico</button>
+          <button type="button" onclick="openFullPage()">Abrir em nova aba</button>
+        </div>
+
+      </div>
+
+      <div id="chart"></div>
+    </div>
+
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+
+      let indicadoresData = null;
+      let lastImageUri = null; // usado para exportar o gráfico
+
+      google.charts.setOnLoadCallback(function () {
+        google.script.run
+          .withSuccessHandler(function (data) {
+            indicadoresData = data;
+            montarUI(data);
+          })
+          .getIndicadoresData();
+      });
+
+      function montarUI(data) {
+        montarIndicadores(data.indicators);
+        montarLinhas(data.rows);
+        drawChart();
+      }
+
+      function escapeId(str) {
+        return str.replace(/[^a-zA-Z0-9_-]/g, '_');
+      }
+
+      function montarIndicadores(indicators) {
+        const container = document.getElementById('indicators-section');
+        Array.from(container.querySelectorAll('.indicator-row')).forEach(el => el.remove());
+
+        indicators.forEach(ind => {
+          const id = escapeId(ind);
+          const row = document.createElement('div');
+          row.className = 'indicator-row inline';
+          row.innerHTML = `
+            <label>
+              <input type="checkbox" class="indicator-check" data-ind="${id}" checked>
+              ${ind}
+            </label>
+            <label>Rótulo:
+              <input type="text" data-type="serie-label" data-ind="${id}" value="${ind}">
+            </label>
+            <label>Cor:
+              <input type="color" data-type="serie-color" data-ind="${id}">
+            </label>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      function montarLinhas(rows) {
+        const container = document.getElementById('rows-section');
+        Array.from(container.querySelectorAll('.row-row')).forEach(el => el.remove());
+
+        rows.forEach((r, idx) => {
+          const label = `${r.empresa} ${r.mes}/${r.ano}`;
+          const row = document.createElement('div');
+          row.className = 'row-row';
+          row.innerHTML = `
+            <label>
+              <input type="checkbox" class="row-check" data-row="${idx}" checked>
+              ${label}
+            </label>
+          `;
+          container.appendChild(row);
+        });
+      }
+
+      function getSelectedIndicators() {
+        return Array.from(document.querySelectorAll('.indicator-check:checked'))
+          .map(chk => chk.getAttribute('data-ind'));
+      }
+
+      function getSelectedRows() {
+        return Array.from(document.querySelectorAll('.row-check:checked'))
+          .map(chk => parseInt(chk.getAttribute('data-row'), 10));
+      }
+
+      function toggleAllSeries(marcar) {
+        document.querySelectorAll('.indicator-check').forEach(chk => {
+          chk.checked = marcar;
+        });
+        drawChart();
+      }
+
+      function toggleAllRows(marcar) {
+        document.querySelectorAll('.row-check').forEach(chk => {
+          chk.checked = marcar;
+        });
+        drawChart();
+      }
+
+      function drawChart() {
+  if (!indicadoresData) return;
+
+  const indIds = getSelectedIndicators();
+  const rowIdxs = getSelectedRows();
+  if (!indIds.length || !rowIdxs.length) return;
+
+  const fullIndicators = indicadoresData.indicators;
+
+  const dataTable = new google.visualization.DataTable();
+  dataTable.addColumn('string', 'Entidade');
+
+  const colors = [];
+
+  indIds.forEach(id => {
+    const originalName = fullIndicators.find(ind => escapeId(ind) === id) || id;
+    const labelInput = document.querySelector(`input[data-type="serie-label"][data-ind="${id}"]`);
+    const colorInput = document.querySelector(`input[data-type="serie-color"][data-ind="${id}"]`);
+    const label = (labelInput && labelInput.value.trim()) || originalName;
+    dataTable.addColumn('number', label);
+    if (colorInput && colorInput.value) {
+      colors.push(colorInput.value);
+    }
+  });
+
+  const rows = [];
+  rowIdxs.forEach(idx => {
+    const r = indicadoresData.rows[idx];
+    const label = `${r.empresa} ${r.mes}/${r.ano}`;
+    const row = [label];
+    indIds.forEach(id => {
+      const originalName = fullIndicators.find(ind => escapeId(ind) === id) || id;
+      const v = Number(r.values[originalName] || 0);
+      row.push(isNaN(v) ? null : v);
+    });
+    rows.push(row);
+  });
+
+  dataTable.addRows(rows);
+
+  const title = document.getElementById('title-input').value || 'Indicadores';
+  const titleFontSize = parseInt(document.getElementById('title-font-size').value || '18', 10);
+  const axisFontSize = parseInt(document.getElementById('axis-font-size').value || '10', 10);
+
+  const chartDiv = document.getElementById('chart');
+
+  // Largura disponível na sidebar
+  const containerWidth =
+    chartDiv.clientWidth ||
+    (chartDiv.parentElement ? chartDiv.parentElement.clientWidth : 400) ||
+    400;
+
+  // Mantém proporção mais “cinema” (16:9). Se quiser mais baixinho, troca pra 3/2.
+  const width = containerWidth;
+  const height = Math.round(width * 9 / 16); // ex.: 320px largura -> ~180px altura
+
+  const options = {
+    title: title,
+    legend: { position: 'top' },
+    width: width,
+    height: height,
+    chartArea: { left: '15%', top: 40, width: '75%', height: '60%' },
+    colors: colors.length ? colors : undefined,
+    titleTextStyle: { fontSize: titleFontSize },
+    hAxis: { textStyle: { fontSize: axisFontSize } },
+    vAxis: { textStyle: { fontSize: axisFontSize } },
+    bar: { groupWidth: '70%' }
+  };
+
+  const chart = new google.visualization.ColumnChart(chartDiv);
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    try {
+      lastImageUri = chart.getImageURI();
+    } catch (e) {
+      lastImageUri = null;
+    }
+  });
+
+  chart.draw(dataTable, options);
+}
+
+  function openFullPage() {
+    // Pede pro Apps Script a URL do Web App e abre em nova aba
+    google.script.run.withSuccessHandler(function (url) {
+      alert(url);
+      if (!url) {
+        alert('Web App ainda não está publicado. Vá em Deploy → Web app no editor do Apps Script.');
+        return;
+      }
+      window.open(url, '_blank');
+    }).getWebAppUrl();
+  }
+
+      function exportChart() {
+        if (!lastImageUri) {
+          alert('Desenhe o gráfico antes de exportar.');
+          return;
+        }
+        // Abre o PNG em outra aba; aí é só salvar como imagem
+        const win = window.open();
+        win.document.write('<img src="' + lastImageUri + '" style="max-width:100%;">');
+      }
+
+      window.addEventListener('resize', drawChart);
+    </script>
+  </body>
+</html>

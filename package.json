@@ -1,0 +1,12 @@
+{
+  "name": "rma-pipeline-apps-script",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pipeline em Google Apps Script que extrai balancetes e DREs com LLM, calcula indicadores e gera relatorios no Google Docs",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

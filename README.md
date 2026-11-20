@@ -92,7 +92,7 @@ Os 73 testes cobrem a lógica que não depende de planilha: leitura de nomes de 
 - Sobram funções longas, em especial a derivação da DRE a partir do balancete e a replicação de blocos de grupo.
 - Planilha como banco de dados tem teto. Com mais empresas e mais histórico, o passo seguinte é um banco relacional e um serviço fora do Apps Script.
 
-Este repositório é a primeira versão do projeto. A segunda foi reescrita em Python (FastAPI), com banco relacional e interface em React.
+Este repositório é a primeira versão do projeto. A segunda, [rma-pipeline-fastapi](https://github.com/FIlIpeDiBr/rma-pipeline-fastapi), foi reescrita em Python (FastAPI), com banco relacional e interface em React.
 
 ## Autor
 

@@ -51,7 +51,7 @@ No dependencies: tests run on Node's built-in runner (Node 20+). The [harness](t
 - Apart from the sensitive functions, helpers are still callable from the web app client. Only entry points should be exposed.
 - A spreadsheet as a database has a ceiling. With more companies and history, the next step is a relational database and a service outside Apps Script.
 
-This repository is the first version of the project. The second one was rewritten in Python (FastAPI) with a relational database and a React front end.
+This repository is the first version of the project. The second one, [rma-pipeline-fastapi](https://github.com/FIlIpeDiBr/rma-pipeline-fastapi), was rewritten in Python (FastAPI) with a relational database and a React front end.
 
 ## Author
 
